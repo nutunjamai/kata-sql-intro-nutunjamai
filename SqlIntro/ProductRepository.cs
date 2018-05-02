@@ -50,7 +50,8 @@ namespace SqlIntro
                 conn.Open();
 
                 var cmd = conn.CreateCommand();
-                cmd.CommandText = "DELETE FROM product WHERE ProductId = @Id"; //Write a delete statement that deletes by id
+                cmd.CommandText = "DELETE FROM product WHERE ProductId = @id";
+                cmd.Parameters.AddWithValue("@Id", id); 
                 cmd.ExecuteNonQuery();
             }
         }
