@@ -26,8 +26,11 @@ namespace SqlIntro
         {
             using (var conn = new MySqlConnection(_connectionString))
             {
+                conn.Open();
+
                 var cmd = conn.CreateCommand();
-                cmd.CommandText = ""; //TODO:  Write a SELECT statement that gets all products
+                cmd.CommandText = "SELECT * FROM product"; //TODO:  Write a SELECT statement that gets all products
+                // select productid as id, name from product
                 var dr = cmd.ExecuteReader();
                 while (dr.Read())
                 {
@@ -44,8 +47,11 @@ namespace SqlIntro
         {
             using (var conn = new MySqlConnection(_connectionString))
             {
+                conn.Open();
+
                 var cmd = conn.CreateCommand();
-                cmd.CommandText = ""; //Write a delete statement that deletes by id
+                cmd.CommandText = "DELETE FROM product WHERE ProductId = @id";
+                cmd.Parameters.AddWithValue("@Id", id); 
                 cmd.ExecuteNonQuery();
             }
         }
@@ -59,10 +65,12 @@ namespace SqlIntro
             //More on this in the future...  Nothing to do here..
             using (var conn = new MySqlConnection(_connectionString))
             {
+                conn.Open();
+
                 var cmd = conn.CreateCommand();
-                cmd.CommandText = "update product set name = @name where id = @id";
-                cmd.Parameters.AddWithValue("@name", prod.Name);
-                cmd.Parameters.AddWithValue("@id", prod.Id);
+                cmd.CommandText = "UPDATE product SET Name = @Name WHERE Id = @Id";
+                cmd.Parameters.AddWithValue("@Name", prod.Name);
+                cmd.Parameters.AddWithValue("@Id", prod.Id);
                 cmd.ExecuteNonQuery();
             }
         }
@@ -74,10 +82,48 @@ namespace SqlIntro
         {
             using (var conn = new MySqlConnection(_connectionString))
             {
+                conn.Open();
+
                 var cmd = conn.CreateCommand();
-                cmd.CommandText = "INSERT into product (name) values(@name)";
-                cmd.Parameters.AddWithValue("@name", prod.Name);
+                cmd.CommandText = "INSERT INTO product (Name) VALUES(@Name)";
+                cmd.Parameters.AddWithValue("@Name", prod.Name);
                 cmd.ExecuteNonQuery();
+            }
+        }
+        /// <summary>
+        /// Performs inner join of products that have reviews
+        /// </summary>
+        public IEnumerable<Product> GetProductsWithReview()
+        {
+            using (var conn = new MySqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT p.ProductId, p.Name, pr.Comments FROM product AS p INNER JOIN productreview AS pr ON p.ProductId = pr.ProductId;";
+                cmd.ExecuteNonQuery();
+                var dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    yield return new Product { Name = dr["Name"].ToString(), Comments = dr["Comments"].ToString() };
+                }
+            }
+        }
+        /// <summary>
+        /// Performs left outer join of products and reviews
+        /// </summary>
+        public IEnumerable<Product> GetProductsAndReviews()
+        {
+            using (var conn = new MySqlConnection(_connectionString))
+            {
+                conn.Open();
+                var cmd = conn.CreateCommand();
+                cmd.CommandText = "SELECT p.ProductId, p.Name, pr.Comments FROM product AS p LEFT OUTER JOIN productreview AS pr ON p.ProductId = pr.ProductId;";
+                var dr = cmd.ExecuteReader();
+                while (dr.Read())
+                {
+                    yield return new Product { Name = dr["Name"].ToString(), Comments = dr["Comments"].ToString() };
+                }
             }
         }
     }
