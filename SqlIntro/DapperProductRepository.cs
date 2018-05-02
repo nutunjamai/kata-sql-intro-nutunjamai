@@ -55,7 +55,8 @@ namespace SqlIntro
             using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                return conn.Query<Product>("SELECT p.ProductId, p.Name, pr.Comments FROM product AS p INNER JOIN productreview AS pr ON p.ProductId = pr.ProductId;");
+                return conn.Query<Product>("SELECT p.ProductId, p.Name, pr.Comments FROM product AS p " +
+                                           "INNER JOIN productreview AS pr ON p.ProductId = pr.ProductId;");
             }
         }
 
