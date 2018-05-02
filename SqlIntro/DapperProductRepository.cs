@@ -37,7 +37,7 @@ namespace SqlIntro
             using (var conn = new MySqlConnection(_connectionString))
             {
                 conn.Open();
-                conn.Execute("INSERT INTO product (name) values(@name)", new { prod.Name });
+                conn.Execute("INSERT INTO product (name) values(@name)", new { name = prod.Name });
             }
         }
 
